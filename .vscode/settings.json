@@ -6,7 +6,8 @@
         "name": "Default",
         "detail": "",
         "description": "Test",
-        "hidden": [".vscode/"]
+        "hidden": [".vscode/", "node_modules/", ".gitignore", ".gitignore"],
+        "peek": []
       },
       {
         "name": "Strict",
@@ -20,6 +21,10 @@
     "**/.svn": true,
     "**/.hg": true,
     "**/CVS": true,
-    "**/.DS_Store": true
-  }
+    "**/.DS_Store": true,
+    ".vscode/": true,
+    "node_modules/": true,
+    ".gitignore": true
+  },
+  "hidefiles.selectedProfile": "Default"
 }
