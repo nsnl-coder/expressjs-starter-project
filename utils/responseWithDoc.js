@@ -1,6 +1,5 @@
 const responseWithDoc = (res, doc, statusCode) => {
-  let results = doc.length > 1 ? doc.length : null
-
+  let results = Array.isArray(doc) ? doc.length : null
   res.status(statusCode || 200).json({
     status: 'success',
     results,
@@ -10,4 +9,4 @@ const responseWithDoc = (res, doc, statusCode) => {
   })
 }
 
-module.exports = responseWithDoc()
+module.exports = responseWithDoc

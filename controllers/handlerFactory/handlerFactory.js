@@ -1,15 +1,15 @@
-const catchAsync = require('./../utils/catchAsync')
-const AppError = require('./../utils/appError')
-const APIFeatures = require('./../../utils/apiFeautures')
-const responseWithDoc = require('./../../utils/responseWithDoc')
+const catchAsync = require('./../../utils/catchAsync')
+const AppError = require('./../../utils/appError')
+const APIFeatures = require('../../utils/apiFeautures')
+const responseWithDoc = require('../../utils/responseWithDoc')
 
-exports.createOne = (Model) =>
+const createOne = (Model) =>
   catchAsync(async (req, res, next) => {
     const doc = await Model.create(req.body)
     responseWithDoc(res, doc, 201)
   })
 
-exports.getOne = (Model, popOptions) =>
+const getOne = (Model, popOptions) =>
   catchAsync(async (req, res, next) => {
     let query = Model.findById(req.params.id)
     if (popOptions) query = query.populate(popOptions)
@@ -22,7 +22,7 @@ exports.getOne = (Model, popOptions) =>
     responseWithDoc(res, doc, 200)
   })
 
-exports.updateOne = (Model) =>
+const updateOne = (Model) =>
   catchAsync(async (req, res, next) => {
     const doc = await Model.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -36,7 +36,7 @@ exports.updateOne = (Model) =>
     responseWithDoc(res, doc, 200)
   })
 
-exports.deleteOne = (Model) =>
+const deleteOne = (Model) =>
   catchAsync(async (req, res, next) => {
     const doc = await Model.findByIdAndDelete(req.params.id)
 
@@ -44,13 +44,12 @@ exports.deleteOne = (Model) =>
       return next(new AppError('No document found with that ID', 404))
     }
 
-    res.status(204).json({
+    res.status(200).json({
       status: 'success',
-      data: null,
     })
   })
 
-exports.getAll = (Model) =>
+const getAll = (Model) =>
   catchAsync(async (req, res, next) => {
     // To allow for nested GET reviews on tour (hack)
     let filter = {}
@@ -73,3 +72,6 @@ exports.getAll = (Model) =>
       },
     })
   })
+
+const handlerFactory = { createOne, updateOne, getOne, deleteOne, getAll }
+module.exports = handlerFactory
