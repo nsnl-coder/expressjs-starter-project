@@ -1,12 +1,12 @@
 const catchAsync = require('./../../utils/catchAsync')
 const AppError = require('./../../utils/appError')
 const APIFeatures = require('../../utils/apiFeautures')
-const responseWithDoc = require('../../utils/responseWithDoc')
+const responseWithData = require('../../utils/responseWithData')
 
 const createOne = (Model) =>
   catchAsync(async (req, res, next) => {
     const doc = await Model.create(req.body)
-    responseWithDoc(res, doc, 201)
+    responseWithData(res, doc, 201)
   })
 
 const getOne = (Model, popOptions) =>
@@ -19,7 +19,7 @@ const getOne = (Model, popOptions) =>
       return next(new AppError('No document found with that ID', 404))
     }
 
-    responseWithDoc(res, doc, 200)
+    responseWithData(res, doc, 200)
   })
 
 const updateOne = (Model) =>
@@ -33,7 +33,7 @@ const updateOne = (Model) =>
       return next(new AppError('No document found with that ID', 404))
     }
 
-    responseWithDoc(res, doc, 200)
+    responseWithData(res, doc, 200)
   })
 
 const updateMany = (Model) =>
