@@ -9,6 +9,19 @@ exports.createOne = (Model) =>
     responseWithDoc(res, doc, 201)
   })
 
+exports.getOne = (Model, popOptions) =>
+  catchAsync(async (req, res, next) => {
+    let query = Model.findById(req.params.id)
+    if (popOptions) query = query.populate(popOptions)
+    const doc = await query
+
+    if (!doc) {
+      return next(new AppError('No document found with that ID', 404))
+    }
+
+    responseWithDoc(res, doc, 200)
+  })
+
 exports.updateOne = (Model) =>
   catchAsync(async (req, res, next) => {
     const doc = await Model.findByIdAndUpdate(req.params.id, req.body, {
@@ -35,19 +48,6 @@ exports.deleteOne = (Model) =>
       status: 'success',
       data: null,
     })
-  })
-
-exports.getOne = (Model, popOptions) =>
-  catchAsync(async (req, res, next) => {
-    let query = Model.findById(req.params.id)
-    if (popOptions) query = query.populate(popOptions)
-    const doc = await query
-
-    if (!doc) {
-      return next(new AppError('No document found with that ID', 404))
-    }
-
-    responseWithDoc(res, doc, 200)
   })
 
 exports.getAll = (Model) =>
