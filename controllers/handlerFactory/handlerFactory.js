@@ -36,6 +36,16 @@ const updateOne = (Model) =>
     responseWithDoc(res, doc, 200)
   })
 
+const updateMany = (Model) =>
+  catchAsync(async (req, res, next) => {
+    const { updateList, ...data } = req.body
+    const doc = await Model.updateMany({ _id: { $in: updateList } }, data)
+    res.status(200).json({
+      status: 'success',
+      doc,
+    })
+  })
+
 const deleteOne = (Model) =>
   catchAsync(async (req, res, next) => {
     const doc = await Model.findByIdAndDelete(req.params.id)
@@ -46,6 +56,15 @@ const deleteOne = (Model) =>
 
     res.status(200).json({
       status: 'success',
+    })
+  })
+
+const deleteMany = (Model) =>
+  catchAsync(async (req, res, next) => {
+    const { deletedCount } = await Model.deleteMany({ _id: { $in: req.body.deleteList } })
+    res.status(200).json({
+      status: 'success',
+      deletedCount,
     })
   })
 
@@ -73,5 +92,5 @@ const getAll = (Model) =>
     })
   })
 
-const handlerFactory = { createOne, updateOne, getOne, deleteOne, getAll }
+const handlerFactory = { createOne, updateOne, getOne, deleteOne, getAll, deleteMany, updateMany }
 module.exports = handlerFactory
