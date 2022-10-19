@@ -1,15 +1,21 @@
 const userModel = require('../models/userModel')
+const responseWithData = require('../utils/responseWithData')
 const handlerFactory = require('./handlerFactory/handlerFactory')
 
 // CONTROLLERS
 
 const createUser = handlerFactory.createOne(userModel)
-const updateUser = handlerFactory.updateOne(userModel)
 const updateManyUsers = handlerFactory.updateMany(userModel)
-const getUser = handlerFactory.getOne(userModel)
 const getAllUsers = handlerFactory.getAll(userModel)
-const deleteUser = handlerFactory.deleteOne(userModel)
 const deleteManyUser = handlerFactory.deleteMany(userModel)
+
+// const getUser = (req, res, next) => {
+//   responseWithData(res, req.user, 200)
+// }
+
+const getUser = handlerFactory.getOne(userModel)
+const updateUser = handlerFactory.updateOne(userModel)
+const deleteUser = handlerFactory.deleteOne(userModel)
 
 // END OF CONTROLLERS
 
