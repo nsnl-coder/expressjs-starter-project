@@ -3,12 +3,12 @@ const authController = require('../controllers/authController')
 const userController = require('../controllers/userController')
 const addUserIdToParams = require('../middleware/addUserIdToParams')
 const routeProtect = require('../middleware/routeProtect')
-const validateUser = require('../validation/user/validateUser')
+const validateUser = require('../validation/user/index')
 
 const Router = express.Router()
 
 // auth route
-Router.post('/login', authController.login)
+Router.post('/login', validateUser.onLogin, authController.login)
 Router.post('/', validateUser.onCreate, authController.createUser)
 
 Router.post('/forgotPassword', authController.forgotPassword)
@@ -22,6 +22,8 @@ Router.route('/')
   .put(userController.updateManyUsers)
 
 // Router.use(addUserIdToParams)
+Router.patch('/updatePassword', authController.updatePassword)
+
 Router.route('/profile')
   .patch(addUserIdToParams, validateUser.onUpdate, userController.updateUser)
   .get(addUserIdToParams, userController.getUser)

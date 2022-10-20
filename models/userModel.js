@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const validator = require('validator')
+const MESSAGE = require('./../validation/const')
 
 // fullname, username, email, password, phone
 
@@ -9,31 +10,32 @@ const userSchema = mongoose.Schema(
     fullname: {
       type: String,
       trim: true,
+      min: [6, MESSAGE.FULLNAME_MIN_LENGTH],
     },
     email: {
       type: String,
+      validate: [validator.isEmail, MESSAGE.PLEASE_PROVIDE_VALID_EMAIL],
       required: true,
-      validate: [validator.isEmail, 'Please provide valid email'],
       unique: true,
     },
     password: {
       type: String,
       required: true,
+      minLength: [8, MESSAGE.PASSWORD_MIN_LENGTH],
+      validate: [validator.isStrongPassword, MESSAGE.PASSWORD_MUST_STRONGER],
       select: false,
-      minLength: [8, 'Password should have at least 8 characters'],
-      validate: [
-        validator.isStrongPassword,
-        'Password must contain 1 uppercase letter(A-Z), 1 number (0-9) and 1 special character (@#$%%^...)',
-      ],
     },
     phone: {
-      type: Number,
+      type: String,
+      minLength: [8, MESSAGE.PHONE_MIN_LENGTH],
+      maxLength: [12, MESSAGE.PHONE_MAX_LENGTH],
+      match: [/^\+?[0-9]*$/, MESSAGE.PHONE_NUMBER_ONLY],
     },
     role: {
       type: String,
       enum: {
         values: ['user', 'admin'],
-        message: "Please provide valid 'role'",
+        message: MESSAGE.PROVIDE_VALID_ROLE,
       },
       default: 'user',
       select: false,

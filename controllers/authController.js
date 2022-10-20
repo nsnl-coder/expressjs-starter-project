@@ -33,7 +33,7 @@ const login = catchAsync(async (req, res, next) => {
   if (!email || !password) return next(new AppError('Please provide both email and password'), 400)
 
   const user = await userModel.findOne({ email }).select('+password')
-  const isLoginValid = user && isLoginPasswordCorrect(password, user.password)
+  const isLoginValid = user && (await isLoginPasswordCorrect(password, user.password))
 
   if (!isLoginValid) return next(new AppError('Incorrect email or password'))
 
@@ -103,6 +103,24 @@ const forgotPassword = catchAsync(async (req, res, next) => {
   })
 })
 
-const authController = { login, createUser, resetPassword, forgotPassword }
+const updatePassword = catchAsync(async (req, res, next) => {
+  // 1) Get user from collection
+  const user = await userModel.findById(req.user.id).select('+password')
+  if (!req.body.password) next(new AppError('Please provide your current password'))
+
+  // 2) check if posted current password is correct
+  if (!(await isLoginPasswordCorrect(req.body.password, user.password))) {
+    return next(new AppError('Your password is incorrect. Please try again'))
+  }
+
+  // 3) if so, update password
+  user.password = req.body.newPassword
+  const newUser = await user.save()
+
+  // 4) Log user in
+  responseWithJwtToken(res, newUser, 200)
+})
+
+const authController = { login, createUser, resetPassword, forgotPassword, updatePassword }
 
 module.exports = authController

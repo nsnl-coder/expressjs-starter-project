@@ -1,28 +1,33 @@
 const yup = require('yup')
+const MESSAGE = require('./../const')
 
-const email = yup.string().email('nodePlease enter a valid email').required('nodeRequired')
+const fullname = yup.string().min(6, MESSAGE.FULLNAME_MIN_LENGTH)
 
-const age = yup
-  .number()
-  .transform((value) => (isNaN(value) ? undefined : value))
-  .positive()
-  .integer()
-  .optional()
+const phone = yup
+  .string()
+  .min(8, 'atletst8')
+  .max(12, MESSAGE.PHONE_MAX_LENGTH)
+  .matches(/^\+?[0-9]*$/, MESSAGE.PHONE_NUMBER_ONLY)
 
-const passwordRules = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{6,})/
+const email = yup
+  .string()
+  .email(MESSAGE.PLEASE_PROVIDE_VALID_EMAIL)
+  .required(MESSAGE.EMAIL_REQUIRED)
+
+const passwordRules = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/
+
 const password = yup
   .string()
-  .min(5, 'nodePassword should contain at least 6 characters')
+  .min(8, MESSAGE.PASSWORD_MIN_LENGTH)
   .matches(passwordRules, {
-    message:
-      'nodePassword must contain at least one capital letter (A-Z), number (0-9) and special character (@,#,$...) ',
+    message: MESSAGE.PASSWORD_MUST_STRONGER,
   })
-  .required('nodeRequired')
+  .required(MESSAGE.PASSWORD_REQUIRED)
 
 const confirmPassword = yup
   .string()
-  .oneOf([yup.ref('password'), null], 'nodePasswords must match')
-  .required('nodeRequired')
+  .oneOf([yup.ref('password'), null], MESSAGE.PASSWORDS_NOT_MATCH)
+  .required(MESSAGE.CONFIRM_PASSWORD_REQUIRED)
 
-const onCreateSchema = yup.object().shape({ email, password, confirmPassword, age })
+const onCreateSchema = yup.object().shape({ fullname, email, password, confirmPassword, phone })
 module.exports = onCreateSchema

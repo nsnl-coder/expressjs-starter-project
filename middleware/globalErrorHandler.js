@@ -43,15 +43,6 @@ const handleValidationErrorDB = (err) => {
         message: `${field.message}`,
       })
     }
-
-    // handle fail to cast error
-    if (field.name === 'CastError') {
-      data.push({
-        fieldName: property,
-        errorType: 'CastError',
-        message: `Expected '${field.kind}' but got '${field.valueType}'`,
-      })
-    }
   }
   return data
 }
