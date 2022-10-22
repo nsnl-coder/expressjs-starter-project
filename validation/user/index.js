@@ -4,7 +4,7 @@ const onUpdateSchema = require('./onUpdateSchema')
 const onLoginSchema = require('./onLoginSchema')
 
 const onCreate = async (req, res, next) => {
-  // turn off node validation to test mongodb validation
+  // turn off node validation in .env to test mongodb validation
   if (process.env.IS_NODE_VALIDATION_ON === 'false') return next()
 
   // 1) Sanitize unwanted data
@@ -13,6 +13,7 @@ const onCreate = async (req, res, next) => {
     passwordChangedAt,
     passwordResetToken,
     passwordResetTokenExpires,
+    isVerified,
     ...sanitizeData
   } = req.body
   // 2) Validate the schema, stop if data is not valid
@@ -36,6 +37,7 @@ const onUpdate = async (req, res, next) => {
     passwordChangedAt,
     passwordResetToken,
     passwordResetTokenExpires,
+    isVerified,
     ...sanitizeData
   } = req.body
 

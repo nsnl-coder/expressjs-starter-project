@@ -18,6 +18,11 @@ const userSchema = mongoose.Schema(
       required: true,
       unique: true,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+
     password: {
       type: String,
       required: true,
@@ -56,6 +61,14 @@ userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return
   this.password = await bcrypt.hash(this.password, 10)
   this.passwordChangedAt = Date.now() - 1000
+  next()
+})
+
+//
+userSchema.pre('save', async function (next) {
+  if (this.isNew) {
+    console.log('djiadnjsdj')
+  }
   next()
 })
 
