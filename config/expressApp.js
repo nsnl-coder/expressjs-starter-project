@@ -21,13 +21,17 @@ app.use(mongoSanitize()) // Data sanitization against NoSQL query injection
 app.use(hpp()) // prevent http parameter pollution
 
 // Router
-const pageNotFound = require('./../middleware/pageNotFound')
+const pageNotFound = require('../middleware/pageNotFound')
 const globalErrorHandler = require('./../middleware/globalErrorHandler')
-const userRouter = require('./../routes/userRoutes')
-const adminRouter = require('../routes/admin/admin')
 
-app.use('/api/v1/users', userRouter)
+const publicRouter = require('../routes/public')
+const clientRouter = require('../routes/client')
+const adminRouter = require('../routes/admin')
+
+app.use('/api/v1/public', publicRouter)
+app.use('/api/v1/client', clientRouter)
 app.use('/api/v1/admin', adminRouter)
+
 app.use('*', pageNotFound)
 app.use(globalErrorHandler)
 

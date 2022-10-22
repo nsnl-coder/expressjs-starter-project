@@ -29,7 +29,7 @@ const handleValidationErrorDB = (err) => {
     // handle missing required field
     if (field.name === 'ValidatorError' && field.kind === 'required') {
       data.push({
-        fieldName: property,
+        field: property,
         errorType: 'missingRequiredField',
         message: `'${field.path}' is required`,
       })
@@ -38,7 +38,7 @@ const handleValidationErrorDB = (err) => {
     // handle general validation error
     else if (field.name === 'ValidatorError' && field.kind !== 'required') {
       data.push({
-        fieldName: property,
+        field: property,
         errorType: 'ValidatorError',
         message: `${field.message}`,
       })
@@ -69,7 +69,11 @@ const globalErrorHandler = (err, req, res, next) => {
   // operational error
 
   if (err.isOperational)
-    return responseWithData(res, { message: err.message }, err.statusCode || 400)
+    return responseWithData(
+      res,
+      { message: err.message },
+      err.statusCode || 400
+    )
 
   // non operational eror
   let data = 'Something went very wrong'

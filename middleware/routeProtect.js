@@ -22,10 +22,6 @@ const routeProtect = catchAsync(async (req, res, next) => {
   if (!user)
     return next(new AppError('Cant find an user belongs to provided token'))
 
-  console.log(user)
-
-  console.log(user.passwordChangedAt + 'vs' + decoded.iat)
-
   if (isRecentlyChangePassword(decoded.iat, user.passwordChangedAt)) {
     return next(
       new AppError('You recently changed your password, please login again !')

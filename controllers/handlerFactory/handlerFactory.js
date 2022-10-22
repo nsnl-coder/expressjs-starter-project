@@ -9,13 +9,10 @@ const createOne = (Model) =>
     responseWithData(res, doc, 201)
   })
 
-const getOne = (Model, query) =>
+const getOne = (Model) =>
   catchAsync(async (req, res, next) => {
-    console.log('from factory', req.params.id)
     let query = Model.findById(req.params.id)
-    if (popOptions) query = query.populate(popOptions)
     const doc = await query
-
     if (!doc) {
       return next(new AppError('No document found with that ID', 404))
     }
@@ -40,10 +37,16 @@ const updateOne = (Model) =>
 const updateMany = (Model) =>
   catchAsync(async (req, res, next) => {
     const { updateList, ...data } = req.body
-    const doc = await Model.updateMany({ _id: { $in: updateList } }, data)
+    const { modifiedCount } = await Model.updateMany(
+      { _id: { $in: updateList } },
+      data,
+      {
+        runValidators: true,
+      }
+    )
     res.status(200).json({
       status: 'success',
-      doc,
+      modifiedCount,
     })
   })
 
