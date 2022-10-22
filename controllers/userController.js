@@ -1,22 +1,30 @@
-const userModel = require('../models/userModel')
-const responseWithData = require('../utils/responseWithData')
+const userModel = require('../models/user')
 const handlerFactory = require('./handlerFactory/handlerFactory')
 
-// CONTROLLERS
+// remove unwanted data from user
+const sanitizeData = (req, res, next) => {
+  // 1) Sanitize unwanted data
+  const {
+    role,
+    passwordChangedAt,
+    passwordResetToken,
+    passwordResetTokenExpires,
+    isVerified,
+    ...sanitizeData
+  } = req.body
+  req.body = sanitizeData
+  next()
+}
 
+// CONTROLLERS
 const createUser = handlerFactory.createOne(userModel)
 const updateManyUsers = handlerFactory.updateMany(userModel)
 const getAllUsers = handlerFactory.getAll(userModel)
 const deleteManyUser = handlerFactory.deleteMany(userModel)
 
-// const getUser = (req, res, next) => {
-//   responseWithData(res, req.user, 200)
-// }
-
 const getUser = handlerFactory.getOne(userModel)
 const updateUser = handlerFactory.updateOne(userModel)
 const deleteUser = handlerFactory.deleteOne(userModel)
-
 // END OF CONTROLLERS
 
 const userController = {
@@ -27,6 +35,7 @@ const userController = {
   deleteManyUser,
   getAllUsers,
   updateManyUsers,
+  sanitizeData,
 }
 
 module.exports = userController

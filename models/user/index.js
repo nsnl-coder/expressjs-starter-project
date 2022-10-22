@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const validator = require('validator')
-const MESSAGE = require('./../validation/const')
+const ERROR_MESSAGE = require('./errorMessage')
 
 // fullname, username, email, password, phone
 
@@ -10,11 +10,11 @@ const userSchema = mongoose.Schema(
     fullname: {
       type: String,
       trim: true,
-      min: [6, MESSAGE.FULLNAME_MIN_LENGTH],
+      min: [6, ERROR_MESSAGE.FULLNAME_MIN_LENGTH],
     },
     email: {
       type: String,
-      validate: [validator.isEmail, MESSAGE.PLEASE_PROVIDE_VALID_EMAIL],
+      validate: [validator.isEmail, ERROR_MESSAGE.PLEASE_PROVIDE_VALID_EMAIL],
       required: true,
       unique: true,
     },
@@ -22,28 +22,29 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
-
     password: {
       type: String,
       required: true,
-      minLength: [8, MESSAGE.PASSWORD_MIN_LENGTH],
-      validate: [validator.isStrongPassword, MESSAGE.PASSWORD_MUST_STRONGER],
+      minLength: [8, ERROR_MESSAGE.PASSWORD_MIN_LENGTH],
+      validate: [
+        validator.isStrongPassword,
+        ERROR_MESSAGE.PASSWORD_MUST_STRONGER,
+      ],
       select: false,
     },
     phone: {
       type: String,
-      minLength: [8, MESSAGE.PHONE_MIN_LENGTH],
-      maxLength: [12, MESSAGE.PHONE_MAX_LENGTH],
-      match: [/^\+?[0-9]*$/, MESSAGE.PHONE_NUMBER_ONLY],
+      minLength: [8, ERROR_MESSAGE.PHONE_MIN_LENGTH],
+      maxLength: [12, ERROR_MESSAGE.PHONE_MAX_LENGTH],
+      match: [/^\+?[0-9]*$/, ERROR_MESSAGE.PHONE_NUMBER_ONLY],
     },
     role: {
       type: String,
       enum: {
         values: ['user', 'admin'],
-        message: MESSAGE.PROVIDE_VALID_ROLE,
+        message: ERROR_MESSAGE.PROVIDE_VALID_ROLE,
       },
       default: 'user',
-      select: false,
     },
     passwordChangedAt: {
       type: Date,
@@ -61,14 +62,6 @@ userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return
   this.password = await bcrypt.hash(this.password, 10)
   this.passwordChangedAt = Date.now() - 1000
-  next()
-})
-
-//
-userSchema.pre('save', async function (next) {
-  if (this.isNew) {
-    console.log('djiadnjsdj')
-  }
   next()
 })
 

@@ -1,12 +1,15 @@
 const jwt = require('jsonwebtoken')
-const userModel = require('../models/userModel')
+const userModel = require('../models/user')
 const AppError = require('../utils/AppError')
 const catchAsync = require('../utils/catchAsync')
 
 const routeProtect = catchAsync(async (req, res, next) => {
   const { authorization: bearerToken } = req.headers
 
-  if (!bearerToken) return next(new AppError('You are not logged in! Please log in to get access'))
+  if (!bearerToken)
+    return next(
+      new AppError('You are not logged in! Please log in to get access')
+    )
 
   if (!bearerToken.startsWith('Bearer'))
     return next(new AppError("The token must start with 'Bearer'"))
@@ -16,14 +19,17 @@ const routeProtect = catchAsync(async (req, res, next) => {
 
   const user = await userModel.findById(decoded.id).select('+passwordChangedAt')
 
-  if (!user) return next(new AppError('Cant find an user belongs to provided token'))
+  if (!user)
+    return next(new AppError('Cant find an user belongs to provided token'))
 
   console.log(user)
 
   console.log(user.passwordChangedAt + 'vs' + decoded.iat)
 
   if (isRecentlyChangePassword(decoded.iat, user.passwordChangedAt)) {
-    return next(new AppError('You recently changed your password, please login again !'))
+    return next(
+      new AppError('You recently changed your password, please login again !')
+    )
   }
 
   req.user = user

@@ -24,8 +24,10 @@ app.use(hpp()) // prevent http parameter pollution
 const pageNotFound = require('./../middleware/pageNotFound')
 const globalErrorHandler = require('./../middleware/globalErrorHandler')
 const userRouter = require('./../routes/userRoutes')
+const adminRouter = require('../routes/admin/admin')
 
 app.use('/api/v1/users', userRouter)
+app.use('/api/v1/admin', adminRouter)
 app.use('*', pageNotFound)
 app.use(globalErrorHandler)
 

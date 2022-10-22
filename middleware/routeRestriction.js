@@ -1,4 +1,4 @@
-const userModel = require('../models/userModel')
+const userModel = require('../models/user')
 const AppError = require('../utils/AppError')
 const catchAsync = require('../utils/catchAsync')
 
@@ -9,7 +9,9 @@ const routeRestriction = (...authorizedRoles) =>
 
     const istrue = authorizedRoles.includes(user.role)
     if (!authorizedRoles.includes(user.role)) {
-      return next(new AppError('You are not authorized to perform this action.', 404))
+      return next(
+        new AppError('You are not authorized to perform this action.', 404)
+      )
     }
     next()
   })

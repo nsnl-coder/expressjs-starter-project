@@ -9,7 +9,7 @@ const createOne = (Model) =>
     responseWithData(res, doc, 201)
   })
 
-const getOne = (Model, popOptions) =>
+const getOne = (Model, query) =>
   catchAsync(async (req, res, next) => {
     console.log('from factory', req.params.id)
     let query = Model.findById(req.params.id)
@@ -62,7 +62,9 @@ const deleteOne = (Model) =>
 
 const deleteMany = (Model) =>
   catchAsync(async (req, res, next) => {
-    const { deletedCount } = await Model.deleteMany({ _id: { $in: req.body.deleteList } })
+    const { deletedCount } = await Model.deleteMany({
+      _id: { $in: req.body.deleteList },
+    })
     res.status(200).json({
       status: 'success',
       deletedCount,
@@ -93,5 +95,13 @@ const getAll = (Model) =>
     })
   })
 
-const handlerFactory = { createOne, updateOne, getOne, deleteOne, getAll, deleteMany, updateMany }
+const handlerFactory = {
+  createOne,
+  updateOne,
+  getOne,
+  deleteOne,
+  getAll,
+  deleteMany,
+  updateMany,
+}
 module.exports = handlerFactory

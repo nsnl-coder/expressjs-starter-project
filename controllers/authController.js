@@ -1,13 +1,15 @@
 const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
-const userModel = require('../models/userModel')
 const catchAsync = require('../utils/catchAsync')
 const AppError = require('../utils/AppError')
 const bcrypt = require('bcrypt')
 const sendEmail = require('../utils/email')
+const userModel = require('../models/user')
 
 const signJwtToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES })
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES,
+  })
 }
 
 const isLoginPasswordCorrect = async (candidate, hashedPassword) => {
@@ -18,7 +20,6 @@ const responseWithJwtToken = (res, user, statusCode) => {
   const status = statusCode.toString().startsWith('2') ? 'success' : 'fail'
   const token = signJwtToken(user._id)
   user.password = undefined
-  user.role = undefined
 
   res.status(statusCode || 200).json({
     status,
@@ -30,10 +31,12 @@ const responseWithJwtToken = (res, user, statusCode) => {
 const login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body
 
-  if (!email || !password) return next(new AppError('Please provide both email and password'), 400)
+  if (!email || !password)
+    return next(new AppError('Please provide both email and password'), 400)
 
   const user = await userModel.findOne({ email }).select('+password')
-  const isLoginValid = user && (await isLoginPasswordCorrect(password, user.password))
+  const isLoginValid =
+    user && (await isLoginPasswordCorrect(password, user.password))
 
   if (!isLoginValid) return next(new AppError('Incorrect email or password'))
 
@@ -48,7 +51,10 @@ const createUser = catchAsync(async (req, res, next) => {
 const resetPassword = catchAsync(async (req, res, next) => {
   // 1) set user based on token
   const resetToken = req.params.token
-  const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex')
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex')
 
   console.log(resetToken, '999999999999')
   console.log(hashedToken)
@@ -81,21 +87,32 @@ const forgotPassword = catchAsync(async (req, res, next) => {
   }
   // 2) Generate reset password token
   const resetToken = crypto.randomBytes(32).toString('hex')
-  user.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex')
+  user.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex')
   user.passwordResetTokenExpires = Date.now() + 10 * 60 * 1000
 
   await user.save()
 
   // 3) Send email
-  const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`
+  const resetURL = `${req.protocol}://${req.get(
+    'host'
+  )}/api/v1/users/resetPassword/${resetToken}`
 
   try {
-    await sendEmail({ to: user.email, subject: 'Reset token (valid 10mins)', text: resetURL })
+    await sendEmail({
+      to: user.email,
+      subject: 'Reset token (valid 10mins)',
+      text: resetURL,
+    })
   } catch (err) {
     user.passwordResetToken = undefined
     user.passwordResetTokenExpires = undefined
     await user.save()
-    return next(new AppError('There was an error sending email. Try again later', 500))
+    return next(
+      new AppError('There was an error sending email. Try again later', 500)
+    )
   }
   res.status(200).json({
     status: 'success',
@@ -106,7 +123,8 @@ const forgotPassword = catchAsync(async (req, res, next) => {
 const updatePassword = catchAsync(async (req, res, next) => {
   // 1) Get user from collection
   const user = await userModel.findById(req.user.id).select('+password')
-  if (!req.body.password) next(new AppError('Please provide your current password'))
+  if (!req.body.password)
+    next(new AppError('Please provide your current password'))
 
   // 2) check if posted current password is correct
   if (!(await isLoginPasswordCorrect(req.body.password, user.password))) {
@@ -121,6 +139,12 @@ const updatePassword = catchAsync(async (req, res, next) => {
   responseWithJwtToken(res, newUser, 200)
 })
 
-const authController = { login, createUser, resetPassword, forgotPassword, updatePassword }
+const authController = {
+  login,
+  createUser,
+  resetPassword,
+  forgotPassword,
+  updatePassword,
+}
 
 module.exports = authController
